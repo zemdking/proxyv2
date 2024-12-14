@@ -2,8 +2,8 @@
   "version": 2,
   "rewrites": [
     {
-      "source": "/:path*",
-      "destination": "https://example.com/:path*"
+      "source": "/*",
+      "destination": "http://172.86.83.9:51281/:path*"
     }
   ],
   "headers": [
