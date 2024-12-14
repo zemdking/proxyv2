@@ -3,7 +3,7 @@
   "rewrites": [
     {
       "source": "/",
-      "destination": "https://bboscheck.basthofer.com"
+      "destination": "https://searx.garudalinux.org"
     }
   ],
   "headers": [
