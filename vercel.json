@@ -2,8 +2,8 @@
   "version": 2,
   "rewrites": [
     {
-      "source": "/:path*",
-      "destination": "http://172.86.83.9/"
+      "source": "/",
+      "destination": "https://bboscheck.basthofer.com"
     }
   ],
   "headers": [
