@@ -1,12 +1,9 @@
 {
   "version": 2,
-  "routes": [
+  "rewrites": [
     {
-      "src": "/(.*)",
-      "dest": "https://example.com/$1",
-      "headers": {
-        "x-proxy-by": "vercel"
-      }
+      "source": "/:path*",
+      "destination": "https://example.com/:path*"
     }
   ],
   "headers": [
@@ -24,6 +21,10 @@
         {
           "key": "Referrer-Policy",
           "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "x-proxy-by",
+          "value": "vercel"
         }
       ]
     }
