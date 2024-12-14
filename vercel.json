@@ -3,7 +3,7 @@
   "rewrites": [
     {
       "source": "/:path*",
-      "destination": "http://172.86.83.9/:path*"
+      "destination": "http://172.86.83.9/"
     }
   ],
   "headers": [
