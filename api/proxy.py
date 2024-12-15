@@ -3,7 +3,7 @@ import requests
 
 app = Flask(__name__)
 
-TARGET_BASE_URL = "https://www.example.com"
+TARGET_BASE_URL = "https://www.thc.org/"
 
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"])
