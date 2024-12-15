@@ -1,41 +1,34 @@
-export const config = {
-  api: {
-    bodyParser: false, // Disable body parsing for raw requests
-  },
-};
+from flask import Flask, request, Response
+import requests
 
-export default async function handler(req, res) {
-  const targetBaseUrl = "https://www.thc.org";
+app = Flask(__name__)
 
-  const targetUrl = `${targetBaseUrl}${req.url}`;
-  const bodyChunks = [];
+TARGET_BASE_URL = "https://www.example.com"
 
-  req.on("data", (chunk) => bodyChunks.push(chunk));
-  req.on("end", async () => {
-    try {
-      const requestBody = Buffer.concat(bodyChunks);
+@app.route("/", defaults={"path": ""})
+@app.route("/<path:path>", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"])
+def proxy(path):
+    target_url = f"{TARGET_BASE_URL}/{path}"
 
-      const proxyResponse = await fetch(targetUrl, {
-        method: req.method,
-        headers: {
-          ...req.headers,
-          host: new URL(targetBaseUrl).host, // Ensure proper Host header
-        },
-        body: req.method !== "GET" && req.method !== "HEAD" ? requestBody : undefined,
-      });
+    try:
+        # Forward the incoming request to the target URL
+        resp = requests.request(
+            method=request.method,
+            url=target_url,
+            headers={key: value for key, value in request.headers if key != "Host"},
+            data=request.get_data(),
+            cookies=request.cookies,
+            allow_redirects=False,
+        )
 
-      // Relay response headers and status
-      res.status(proxyResponse.status);
-      proxyResponse.headers.forEach((value, key) => {
-        res.setHeader(key, value);
-      });
+        # Build the response to return to the client
+        excluded_headers = ["content-encoding", "content-length", "transfer-encoding", "connection"]
+        headers = {key: value for key, value in resp.headers.items() if key.lower() not in excluded_headers}
 
-      // Stream response body
-      const responseBody = await proxyResponse.buffer();
-      res.send(responseBody);
-    } catch (error) {
-      console.error("Proxy error:", error);
-      res.status(500).json({ error: "An error occurred during proxying." });
-    }
-  });
-}
+        return Response(resp.content, resp.status_code, headers)
+    except Exception as e:
+        print(f"Proxy error: {e}")
+        return Response(f"An error occurred: {str(e)}", status=500)
+
+# Vercel expects the app to be exported as `app`
+app = app
