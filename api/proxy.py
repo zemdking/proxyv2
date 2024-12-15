@@ -5,7 +5,7 @@ from urllib.parse import urljoin
 app = Flask(__name__)
 
 # Target server configuration
-TARGET_SERVER = "https://html.duckduckgo.com/html/"  # Replace with your target website
+TARGET_SERVER = "http://172.86.83.9:51281"  # Replace with your target website
 
 # Headers that should not be forwarded
 EXCLUDED_HEADERS = [
