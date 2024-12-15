@@ -1,8 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/:path*", // Matches all paths
-      "destination": "/api/proxy" // Redirects them to the proxy function
+      "source": "/:path*", 
+      "destination": "/api/proxy" 
     }
   ]
 }
