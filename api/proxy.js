@@ -1,27 +1,41 @@
+export const config = {
+  api: {
+    bodyParser: false, // Disable body parsing for raw requests
+  },
+};
+
 export default async function handler(req, res) {
-  const targetBaseUrl = "https://www.thc.org"; // Replace with your target domain
-  const targetUrl = `${targetBaseUrl}${req.url.replace('/api', '')}`;
+  const targetBaseUrl = "https://www.thc.org";
 
-  try {
-    const response = await fetch(targetUrl, {
-      method: req.method,
-      headers: {
-        ...req.headers,
-        host: new URL(targetBaseUrl).host, // Ensures proper host headers for the target
-      },
-      body: req.method !== "GET" && req.method !== "HEAD" ? req.body : null,
-    });
+  const targetUrl = `${targetBaseUrl}${req.url}`;
+  const bodyChunks = [];
 
-    // Relay headers from the target response
-    response.headers.forEach((value, key) => {
-      res.setHeader(key, value);
-    });
+  req.on("data", (chunk) => bodyChunks.push(chunk));
+  req.on("end", async () => {
+    try {
+      const requestBody = Buffer.concat(bodyChunks);
 
-    // Send the status and body of the response
-    const responseData = await response.buffer();
-    res.status(response.status).send(responseData);
-  } catch (error) {
-    console.error("Proxy error:", error);
-    res.status(500).json({ message: "An error occurred while proxying the request." });
-  }
+      const proxyResponse = await fetch(targetUrl, {
+        method: req.method,
+        headers: {
+          ...req.headers,
+          host: new URL(targetBaseUrl).host, // Ensure proper Host header
+        },
+        body: req.method !== "GET" && req.method !== "HEAD" ? requestBody : undefined,
+      });
+
+      // Relay response headers and status
+      res.status(proxyResponse.status);
+      proxyResponse.headers.forEach((value, key) => {
+        res.setHeader(key, value);
+      });
+
+      // Stream response body
+      const responseBody = await proxyResponse.buffer();
+      res.send(responseBody);
+    } catch (error) {
+      console.error("Proxy error:", error);
+      res.status(500).json({ error: "An error occurred during proxying." });
+    }
+  });
 }
