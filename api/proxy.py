@@ -1,4 +1,5 @@
-from flask import Flask, request, Response
+from flask import Flask, request, Response, send_file, redirect
+import os
 import requests
 from urllib.parse import urljoin
 
@@ -61,9 +62,25 @@ def get_proxied_response(request):
 
 @app.route('/', defaults={'path': ''}, methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'])
 @app.route('/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'])
-def proxy(path):
-    """Main proxy route that handles all paths"""
+def proxy_or_verify(path):
+    """Main route to handle verification or proxy"""
+    access_token = request.cookies.get('ACCESS_TOKEN')
+
+    if not access_token:
+        # Serve index.html for token generation
+        return send_file('index.html')
+
+    # If access token exists, proxy the request
     return get_proxied_response(request)
 
+@app.route('/set-token', methods=['POST'])
+def set_token():
+    """Endpoint to set the generated access token in a cookie"""
+    token = request.json.get('token')
+    if not token:
+        return Response("Missing token", status=400)
+    response = Response("Token set successfully")
+    response.set_cookie('ACCESS_TOKEN', token, httponly=True)
+    return response
 
 app = app
