@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Verification</title>
+    <style>
+        :root {
+            --neon-green: #39ff14;
+            --dark-bg: #0a0a0a;
+            --card-bg: #141414;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .grid-background {
+            position: fixed;
+            width: 200%;
+            height: 200%;
+            background-image:
+                linear-gradient(rgba(57, 255, 20, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(57, 255, 20, 0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+            transform: rotate(45deg);
+            animation: grid-scroll 30s linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes grid-scroll {
+            0% { transform: rotate(45deg) translate(-50%, -50%); }
+            100% { transform: rotate(45deg) translate(0%, 0%); }
+        }
+
+        .container {
+            background: var(--card-bg);
+            border: 1px solid rgba(57, 255, 20, 0.3);
+            border-radius: 12px;
+            padding: 3rem;
+            width: 90%;
+            max-width: 460px;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            box-shadow:
+                0 0 30px rgba(57, 255, 20, 0.15),
+                0 0 60px rgba(57, 255, 20, 0.1),
+                inset 0 0 30px rgba(57, 255, 20, 0.05);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .logo svg {
+            width: 90px;
+            height: 90px;
+            filter: drop-shadow(0 0 15px rgba(57, 255, 20, 0.5));
+        }
+
+        .logo img {
+    width: 90px;
+    height: 90px;
+    filter: drop-shadow(0 0 15px rgba(57, 255, 20, 0.5));
+}
+        .logo::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            background: rgba(57, 255, 20, 0.1);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.5; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.2; }
+            100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.5; }
+        }
+
+        h2 {
+            color: var(--neon-green);
+            font-size: 1.75rem;
+            margin: 0 0 2rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
+        }
+
+        .progress-container {
+            position: relative;
+            margin: 2rem 0;
+        }
+
+        .progress {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--neon-green);
+            box-shadow: 0 0 15px var(--neon-green);
+            width: 0;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .status {
+            color: var(--text-secondary);
+            margin: 1.5rem 0;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            min-height: 24px;
+            transition: color 0.3s ease;
+        }
+
+        .result {
+            background: rgba(57, 255, 20, 0.1);
+            border: 1px solid rgba(57, 255, 20, 0.2);
+            padding: 1.25rem;
+            border-radius: 6px;
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            word-break: break-all;
+            display: none;
+            color: var(--neon-green);
+            text-shadow: 0 0 5px rgba(57, 255, 20, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 0%, rgba(57, 255, 20, 0.1) 50%, transparent 100%);
+            animation: sweep 3s linear infinite;
+        }
+
+        @keyframes sweep {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .system-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+            text-align: left;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .info-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.75rem;
+            border-radius: 4px;
+            border: 1px solid rgba(57, 255, 20, 0.1);
+        }
+
+        .info-label {
+            color: var(--neon-green);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-background"></div>
+    <div class="container">
+        <div class="logo">
+    <img src="logo.png" alt="Security Logo">
+</div>
+        <h2>Security Verification</h2>
+        <div class="status">Initializing system check...</div>
+        <div class="progress-container">
+            <div class="progress">
+                <div class="progress-bar"></div>
+            </div>
+        </div>
+        <div class="system-info">
+            <div class="info-item">
+                <div class="info-label">Resolution</div>
+                <div class="info-value" id="screenRes">-</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Platform</div>
+                <div class="info-value" id="platform">-</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Time Zone</div>
+                <div class="info-value" id="timezone">-</div>
+            </div>
+        </div>
+        <div class="result"></div>
+    </div>
+    <script>
+        function generateToken() {
+            const timestamp = Date.now();
+            const randomSeed = Math.floor(Math.random() * 10000);
+            const a = timestamp % 997;
+            const b = (randomSeed * 31) % 883;
+            const c = Math.cos(timestamp) * 1000;
+            const value = (a * b + c) >>> 0;
+            return value.toString(36) + timestamp.toString(36);
+        }
+
+        function getBasicInfo() {
+            return {
+                screen: `${window.screen.width}x${window.screen.height}`,
+                timezone: -(new Date().getTimezoneOffset() / 60),
+                platform: navigator.platform
+            };
+        }
+
+        function updateSystemInfo(info) {
+            document.getElementById('screenRes').textContent = info.screen;
+            document.getElementById('platform').textContent = info.platform;
+            document.getElementById('timezone').textContent = `UTC${info.timezone >= 0 ? '+' : ''}${info.timezone}`;
+        }
+
+        async function verify() {
+            const progress = document.querySelector('.progress-bar');
+            const status = document.querySelector('.status');
+            const result = document.querySelector('.result');
+            const info = getBasicInfo();
+
+            updateSystemInfo(info);
+
+            const steps = [
+                { progress: '30%', message: 'Running environment analysis...', delay: 800 },
+                { progress: '60%', message: 'Performing security checks...', delay: 700 },
+                { progress: '85%', message: 'Generating secure token...', delay: 600 },
+                { progress: '100%', message: 'Verification complete', delay: 400 }
+            ];
+
+            for (const step of steps) {
+                progress.style.width = step.progress;
+                status.textContent = step.message;
+                await new Promise(resolve => setTimeout(resolve, step.delay));
+            }
+
+            const token = generateToken();
+            result.style.display = 'block';
+            result.textContent = `ACCESS_TOKEN=${token}`;
+        }
+
+        verify();
+    </script>
+</body>
+</html>
