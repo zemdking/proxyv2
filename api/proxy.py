@@ -5,7 +5,7 @@ from urllib.parse import urljoin
 app = Flask(__name__)
 
 # Target server configuration
-TARGET_SERVER = "https://your-target-website.com"  # Replace with your target website
+TARGET_SERVER = "https://www.thc.org"  # Replace with your target website
 
 # Headers that should not be forwarded
 EXCLUDED_HEADERS = [
